@@ -35,6 +35,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         isAlpha: true,
       },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "Pending"
+      },
     },
     {
       sequelize,

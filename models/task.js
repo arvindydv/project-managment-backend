@@ -46,22 +46,17 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         isAlpha: true,
       },
-      pointer: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
+     
       deadline: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      watch: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-        allowNull: false,
-      },
+      
       status: {
         type: Sequelize.STRING,
         allowNull: false,
         isAlpha: true,
+        defaultValue: "pending"
       },
       sprintId: {
         allowNull: false,

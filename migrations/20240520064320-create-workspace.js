@@ -19,6 +19,10 @@ module.exports = {
         allowNull: false,
         isAlpha: true,
       },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "Pending",
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

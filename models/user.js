@@ -15,11 +15,7 @@ module.exports = (sequelize, Sequelize) => {
         as: "Designation",
       });
 
-      this.belongsToMany(models.Role, {
-        through: models.UserRoleMapping,
-        foreignKey: "userId",
-        as: "Role",
-      });
+      
 
       this.belongsToMany(models.Workspace, {
         through: models.UserWorkspaceMapping,

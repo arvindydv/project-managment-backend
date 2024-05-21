@@ -19,10 +19,6 @@ module.exports = {
         allowNull: false,
         isAlpha: true,
       },
-      pointer: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       deadline: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -31,11 +27,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
         isAlpha: true,
+        defaultValue: "pending"
       },
-      watch: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-        allowNull: false,
-      },
+     
       sprint_id: {
         allowNull: false,
         type: Sequelize.UUID,

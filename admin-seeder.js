@@ -29,11 +29,6 @@ async function admin() {
           return true;
         },
       },
-      {
-        name: "roleKey",
-        description: colors.magenta("Role should be ADM or USR"),
-        required: true,
-      },
 
       {
         name: "designationCode",
@@ -42,19 +37,22 @@ async function admin() {
       },
     ],
     async function (err, result) {
-      result.roleKey = result.roleKey.toUpperCase();
+      // result.roleKey = result.roleKey.toUpperCase();
       const t = await sequelize.transaction();
       try {
+        console.log("tyyyyyyyy>>>>>>", result);
         const data = await models.User.create(
           {
             firstName: result.firstName,
             lastName: result.lastName,
             email: result.email,
             password: await hash(result.password, 10),
-            role: "ADM"
+            role: "ADM",
           },
           { transaction: t }
         );
+
+        console.log(data, "dadadadad");
         const designation = await models.Designation.findOne(
           {
             where: {
@@ -65,31 +63,15 @@ async function admin() {
         );
 
         const userId = data.dataValues.id;
-
-        await models.UserDesignationMapping.create(
+        console.log(userId, "userid");
+        const ds = await models.UserDesignationMapping.create(
           {
             userId: userId,
             designationId: designation.id,
           },
           { transaction: t }
         );
-
-        const role = await models.Role.findOne(
-          {
-            where: {
-              roleKey: result.roleKey,
-            },
-          },
-          { transaction: t }
-        );
-
-        await models.UserRoleMapping.create(
-          {
-            roleId: role.id,
-            userId: userId,
-          },
-          { transaction: t }
-        );
+        console.log(ds, "usedsdsdsrid");
 
         console.log(colors.cyan("You are good to go."));
         await t.commit();
