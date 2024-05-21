@@ -145,13 +145,70 @@ const resetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password updated successfully"));
 });
 
-// const getAllUsers = asyncHandler (async (req, res)=>{
+const getAllUsers = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page, 10) || 1; // Default page is 1
+  const limit = parseInt(req.query.limit, 10) || 10; // Default limit is 10
+  const offset = (page - 1) * limit;
 
-// })
+  const users = await models.User.findAll({
+    attributes: {
+      exclude: ["created_at", "updated_at", "deleted_at", "password"],
+    },
+    include: [
+      {
+        model: models.Designation,
+        as: "Designation",
+        attributes: ["designationTitle"],
+      },
+    ],
+    limit: limit,
+    offset: offset,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, users, "All users got successfully"));
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const user = await models.User.findOne({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "user got successfully"));
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const user = await models.User.findOne({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+  }
+  await models.User.destroy({
+    where: { id: userId },
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "User deleted sucessfully"));
+});
 
 module.exports = {
   createUser,
   loginUser,
   logout,
   resetPassword,
+  getAllUsers,
+  getUserById,
+  deleteUser,
 };
