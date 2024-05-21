@@ -51,6 +51,7 @@ async function admin() {
             lastName: result.lastName,
             email: result.email,
             password: await hash(result.password, 10),
+            role: "ADM"
           },
           { transaction: t }
         );

@@ -59,6 +59,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         isAlphanumeric: true,
       },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "USR"
+      },
     },
     {
       sequelize,
