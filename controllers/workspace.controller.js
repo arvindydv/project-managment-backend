@@ -39,6 +39,7 @@ const createWorkspace = asyncHandler(async (req, res) => {
 // update  workspace
 const updateWorkspace = asyncHandler(async (req, res) => {
   const workspaceId = req.params.workspaceId;
+  const payload = req.body;
 
   const findWorkspace = await models.Workspace.findOne({
     where: { id: workspaceId },
@@ -172,12 +173,18 @@ const addUserInWorkspace = asyncHandler(async (req, res) => {
       .json(new ApiResponse(404, {}, "Designation not found"));
   }
 
+  const UserDesignation = await models.Designation.findOne({
+    where: {
+      designationCode: "101",
+    },
+  });
+
   const userWorkspaceMapping = await models.UserWorkspaceMapping.findOne({
     where: {
       workspaceId: workspace.dataValues.id,
       [Op.and]: [
         { userId: req.user.id },
-        { designationId: designation.dataValues.id },
+        { designationId: UserDesignation.dataValues.id },
       ],
     },
   });
@@ -219,12 +226,18 @@ const removeUserFromWorkspace = asyncHandler(async (req, res) => {
     return res.status(404).json(new ApiResponse(404, {}, "User not found"));
   }
 
+  const UserDesignation = await models.Designation.findOne({
+    where: {
+      designationCode: "101",
+    },
+  });
+
   const userWorkspaceMapping = await models.UserWorkspaceMapping.findOne({
     where: {
       workspaceId: workspace.dataValues.id,
       [Op.and]: [
         { userId: req.user.id },
-        { designationId: designation.dataValues.id },
+        { designationId: UserDesignation.dataValues.id },
       ],
     },
   });
