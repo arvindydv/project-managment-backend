@@ -262,6 +262,88 @@ const removeUserFromWorkspace = asyncHandler(async (req, res) => {
 // update user designation in workspace
 const updateUserInWorkspace = asyncHandler(async (req, res) => {});
 
+const getAllWorkspace = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = page * limit;
+
+  const workspaces = await models.UserWorkspaceMapping.findAll({
+    attributes: {
+      exclude: [
+        "created_at",
+        "userId",
+        "designationId",
+        "updated_at",
+        "deleted_at",
+      ],
+    },
+    include: [
+      {
+        model: models.Workspace,
+        as: "Workspace",
+        attributes: ["name"],
+      },
+      {
+        model: models.User,
+        as: "User",
+        attributes: ["email"],
+      },
+      {
+        model: models.Designation,
+        as: "Designation",
+        attributes: ["designationTitle"],
+      },
+    ],
+    limit: limit,
+    offset: offset,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, workspaces, "All workspaces got successfully"));
+});
+
+const getWorkspaceById = asyncHandler(async (req, res) => {
+  const { workspaceId } = req.params;
+
+  const workspace = await models.UserWorkspaceMapping.findOne({
+    where: { workspaceId },
+    attributes: {
+      exclude: [
+        "created_at",
+        "userId",
+        "designationId",
+        "updated_at",
+        "deleted_at",
+      ],
+    },
+    include: [
+      {
+        model: models.Workspace,
+        as: "Workspace",
+        attributes: ["name"],
+      },
+      {
+        model: models.User,
+        as: "User",
+        attributes: ["email"],
+      },
+      {
+        model: models.Designation,
+        as: "Designation",
+        attributes: ["designationTitle"],
+      },
+    ],
+  });
+
+  if (!workspace) {
+    return res.status(404).json(new ApiResponse(404, null, "Workspace not found"));
+  }
+
+  return res.status(200).json(new ApiResponse(200, workspace, "Workspace retrieved successfully"));
+});
+
+
 module.exports = {
   createWorkspace,
   updateWorkspace,
@@ -269,4 +351,6 @@ module.exports = {
   addUserInWorkspace,
   removeUserFromWorkspace,
   updateUserInWorkspace,
+  getAllWorkspace,
+  getWorkspaceById
 };
