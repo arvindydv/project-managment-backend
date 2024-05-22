@@ -133,7 +133,7 @@ const deleteWorkspace = asyncHandler(async (req, res) => {
 
 // add user in
 const addUserInWorkspace = asyncHandler(async (req, res) => {
-  const { payload } = req.body;
+  const payload = req.body;
   if (!payload.workspaceId || !payload.userId || !payload.designationId) {
     return res
       .status(400)
@@ -179,6 +179,16 @@ const addUserInWorkspace = asyncHandler(async (req, res) => {
     },
   });
 
+  const findUserInworkspace = await models.UserWorkspaceMapping.findOne({
+    where: { userId: payload.userId, workspaceId: payload.workspaceId },
+  });
+
+  if (findUserInworkspace) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {}, "User is already in the workspace"));
+  }
+
   const userWorkspaceMapping = await models.UserWorkspaceMapping.findOne({
     where: {
       workspaceId: workspace.dataValues.id,
@@ -197,7 +207,7 @@ const addUserInWorkspace = asyncHandler(async (req, res) => {
       );
   }
 
-  const addUserInWorkspace = models.UserWorkspaceMapping.create(payload);
+  const addUserInWorkspace = await models.UserWorkspaceMapping.create(payload);
   return res
     .status(201)
     .json(new ApiResponse(201, addUserInWorkspace, "User added in workspace"));
@@ -206,7 +216,7 @@ const addUserInWorkspace = asyncHandler(async (req, res) => {
 //  remove user from workspace
 const removeUserFromWorkspace = asyncHandler(async (req, res) => {
   const { payload } = req.body;
-  if (!payload.workspaceId || !payload.userId || !payload.designationId) {
+  if (!payload.workspaceId || !payload.userId) {
     return res
       .status(400)
       .json(new ApiResponse(400, {}, "All fields are required"));
@@ -217,7 +227,7 @@ const removeUserFromWorkspace = asyncHandler(async (req, res) => {
       workspaceId: workspaceId,
       [Op.and]: [
         { userId: req.user.id },
-        { designationId: designation.dataValues.id },
+        
       ],
     },
   });
@@ -281,12 +291,12 @@ const getAllWorkspace = asyncHandler(async (req, res) => {
       {
         model: models.Workspace,
         as: "Workspace",
-        attributes: ["name"],
+        attributes: ["name", "description"],
       },
       {
         model: models.User,
         as: "User",
-        attributes: ["email"],
+        attributes: ["email", "firstName", "lastName"],
       },
       {
         model: models.Designation,
@@ -321,12 +331,12 @@ const getWorkspaceById = asyncHandler(async (req, res) => {
       {
         model: models.Workspace,
         as: "Workspace",
-        attributes: ["name"],
+        attributes: ["name", "description"],
       },
       {
         model: models.User,
         as: "User",
-        attributes: ["email"],
+        attributes: ["email", "firstName", "lastName"],
       },
       {
         model: models.Designation,
@@ -337,12 +347,16 @@ const getWorkspaceById = asyncHandler(async (req, res) => {
   });
 
   if (!workspace) {
-    return res.status(404).json(new ApiResponse(404, null, "Workspace not found"));
+    //localhost:8080/api/workspaces/adduser
+    http: return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Workspace not found"));
   }
 
-  return res.status(200).json(new ApiResponse(200, workspace, "Workspace retrieved successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, workspace, "Workspace retrieved successfully"));
 });
-
 
 module.exports = {
   createWorkspace,
@@ -352,5 +366,5 @@ module.exports = {
   removeUserFromWorkspace,
   updateUserInWorkspace,
   getAllWorkspace,
-  getWorkspaceById
+  getWorkspaceById,
 };
